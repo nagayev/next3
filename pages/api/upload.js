@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import fs from "fs";
+import s3 from "../../s3";
 
 export const config = {
   api: {
@@ -21,8 +21,10 @@ const post = async (req, res) => {
 };
 
 const saveFile = async (file) => {
-  const data = fs.readFileSync(file.filepath); //чтение содержимого файла
-  fs.writeFileSync(`./public/${file.originalFilename}`, data); //сохранени файла
+  //Сохраняем в S3
+  await s3.S3Upload(file.filepath,file.originalFilename);
+  //fs.writeFileSync(`./public/${file.originalFilename}`, data);
+  //Такое сохранение файла не работает, потому что у нас нет права записывать файлы по пути ./public
   await fs.unlinkSync(file.filepath); //Удаление временного файла
   return;
 };
